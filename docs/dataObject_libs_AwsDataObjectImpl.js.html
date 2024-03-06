@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: dataObject/libs/AwsDataObjectImpl.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: dataObject/libs/AwsDataObjectImpl.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const AWS = require('aws-sdk');
+const fs = require('fs');
+const IAwsDataObject = require('./IAwsDataObject');
+const { ObjectNotFoundException } = require('./exceptions/AwsDataObjectImplException');
+
+
+/**
+ * Implement of IAwsDataObject interface using AWS SDK.
+ * @class
+ * @implements {IAwsDataObject}
+ */
+
+
+class AwsDataObjectImpl {
+  constructor(bucketName, region, accessKeyId, secretAccessKey) {
+    this.bucketName = bucketName;
+    this.s3 = null;
+    this.region = region;
+    this.accessKeyId = accessKeyId;
+    this.secretAccessKey = secretAccessKey;
+    this.init();
+  }
+
+  async init() {
+    try {
+      this.s3 = new AWS.S3({
+        region: this.region,
+        accessKeyId: this.accessKeyId,
+        secretAccessKey: this.secretAccessKey
+      });
+
+      await this.doesBucketExist();
+    } catch (err) {
+      if (err.code === 'NotFound') {
+        await this.createBucket();
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  async createBucket() {
+    const params = { Bucket: this.bucketName, ACL: 'public-read' };
+    try {
+      await this.s3.createBucket(params).promise();
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async doesBucketExist(bucketName) {
+    try {
+      await this.s3.headBucket({ Bucket: bucketName }).promise();
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async doesObjectExist(key) {
+    if (typeof key !== 'string') {
+      throw new TypeError('key must be a string');
+    }
+    try {
+      await this.s3.headObject({ Bucket: this.bucketName, Key: key }).promise();
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async uploadObject(fileContent, fileName) {
+
+    const params = {
+      Bucket: this.bucketName,
+      Key: fileName,
+      Body: fileContent,
+      ContentType: 'image/jpeg'
+    };
+
+    try {
+      const data = await this.s3.upload(params).promise();
+      return data;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async downloadObject(key, localPath) {
+    if (typeof key !== 'string') {
+      throw new TypeError('key must be a string');
+    }
+    if (localPath &amp;&amp; typeof localPath !== 'string') {
+      throw new TypeError('localPath must be a string');
+    }
+    const params = {
+      Bucket: this.bucketName,
+      Key: key
+    };
+
+    try {
+      const data = await this.s3.getObject(params).promise();
+      fs.writeFileSync(localPath, data.Body);
+    } catch (err) {
+      throw new ObjectNotFoundException(err.message);
+    }
+  }
+
+  async publish(remoteFullPath, expirationTime = 90) {
+    if (remoteFullPath &amp;&amp; typeof remoteFullPath !== 'string') {
+      throw new TypeError('key must be a string');
+    }
+    const params = {
+      Bucket: this.bucketName,
+      Key: remoteFullPath,
+      Expires: expirationTime
+    };
+
+    try {
+      const objectExists = await this.doesObjectExist(remoteFullPath);
+      if (!objectExists) {
+        throw new Error('NoSuchKey: The specified key does not exist.');
+      }
+
+      const url = await this.s3.getSignedUrlPromise('getObject', params);
+      return url;
+    } catch (err) {
+      throw new ObjectNotFoundException(err.message);
+    }
+  }
+
+  async remove(remoteFullPath) {
+    if (typeof remoteFullPath !== 'string') {
+      throw new TypeError('remoteFullPath must be a string');
+    }
+    const listParams = {
+      Bucket: this.bucketName,
+      Prefix: remoteFullPath
+    };
+
+    try {
+      const listedObjects = await this.s3.listObjectsV2(listParams).promise();
+
+      if (listedObjects.Contents.length === 0) return;
+
+      const deleteParams = {
+        Bucket: this.bucketName,
+        Delete: {
+          Objects: listedObjects.Contents.map(({ Key }) => ({ Key }))
+        }
+      };
+
+      await this.s3.deleteObjects(deleteParams).promise();
+
+      if (listedObjects.IsTruncated) await this.deleteObjectsRecursive(remoteFullPath)
+
+    } catch (err) {
+      throw err;
+    }
+  }
+}
+
+module.exports = AwsDataObjectImpl;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="AwsDataObjectImpl.html">AwsDataObjectImpl</a></li><li><a href="LabelDetector.html">LabelDetector</a></li></ul><h3>Interfaces</h3><ul><li><a href="IAwsDataObject.html">IAwsDataObject</a></li><li><a href="ILabelDetector.html">ILabelDetector</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Sun Feb 25 2024 19:07:43 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
