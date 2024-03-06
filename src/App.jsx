@@ -5,21 +5,19 @@ import { useLanguage } from './providers/languages';
 import Languages from './components/Languages';
 import Error from './components/Error';
 import DataResult from './components/DataResult';
+import { useError } from './providers/errors';
 
 const API_URL_BUCKET = 'http://localhost:28468';
 const API_URL_ANALYZE = 'http://localhost:28469';
 
 export default function App() {
   const [dataSource, setDataSource] = useState('');
-  const [error, setError] = useState({
-    message: '',
-    success: false
-
-  });
   const [returnData, setReturnData] = useState();
   const [maxLabel, setMaxLabel] = useState(10);
   const [minConfidence, setMinConfidence] = useState(70);
   const { translations } = useLanguage();
+  const { error, setError } = useError();
+
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
@@ -116,7 +114,7 @@ export default function App() {
 
       <Languages />
 
-      <form onSubmit={handleSubmitAnalyze} encType="multipart/form-data">
+      <form onSubmit={handleSubmitAnalyze} encType="multipart/form-data" id='formDataInput'>
         <h1>{translations.title}</h1>
         <p>{translations.description}</p>
         <label htmlFor="dataSource">{translations.dataSource}</label>

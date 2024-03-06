@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useLanguage } from '../providers/languages';
 const FileUpload = ({ handleUploadedFiles }) => {
@@ -14,9 +14,23 @@ const FileUpload = ({ handleUploadedFiles }) => {
             'image/heic': [],
         },
         maxFiles: 1,
+        maxSize: 5242880,
+        onError: (fileRejections) => {
+            if (fileRejections.length > 0) {
+                alert('File is not a valid image');
+            }
+        },
+
         onDrop: (acceptedFiles) => {
-            setUploadedFiles(acceptedFiles);
-            handleUploadedFiles(acceptedFiles);
+            const img = new Image();
+            img.onload = () => {
+                setUploadedFiles(acceptedFiles);
+                handleUploadedFiles(acceptedFiles);
+            };
+            img.onerror = () => {
+                alert('File is not a valid image');
+                return
+            };
         },
     });
 
