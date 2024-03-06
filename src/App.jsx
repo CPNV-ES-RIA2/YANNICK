@@ -21,6 +21,20 @@ export default function App() {
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
+    if (e.target.potHonney.value) {
+      setError({ message: 'errorPotHonney', success: false });
+      return;
+    }
+
+    if (e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100) {
+      setError({ message: 'errorMaxLabel', success: false });
+      return;
+    }
+    if (e.target.minConfidence.value < 1 || e.target.minConfidence.value > 100) {
+      setError({ message: 'errorMinConfidence', success: false });
+      return;
+    }
+
     const file = dataSource[0];
 
     let returnUrl = '';
@@ -121,10 +135,11 @@ export default function App() {
         <br />
         <FileUpload handleUploadedFiles={handleUploadedFiles} />
         <label htmlFor="maxLabel">{translations.maxLabel}</label>
-        <input type="number" name="maxLabel" id="maxLabel" value={maxLabel} onChange={(e) => setMaxLabel(e.target.value)} min={1} />
+        <input type="number" name="maxLabel" id="maxLabel" value={maxLabel} onChange={(e) => setMaxLabel(e.target.value)} />
         <label htmlFor="minConfidence">{translations.minConfidence}</label>
-        <input type="number" name="minConfidence" id="minConfidence" value={minConfidence} onChange={(e) => setMinConfidence(e.target.value)} min={1} max={100} />
+        <input type="number" name="minConfidence" id="minConfidence" value={minConfidence} onChange={(e) => setMinConfidence(e.target.value)} onError={(e) => setError({ message: 'errorMinConfidence', success: false })} />
         <br />
+        <input type="hidden" id="potHonney" />
         <button id="analyzeButton">{translations.analyze}</button>
       </form>
 
