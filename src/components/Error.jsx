@@ -9,9 +9,8 @@ const Error = () => {
     if (!isVisible) return null;
 
     const errorColor = error.success ? 'green' : 'red';
-    console.log('errorColor', errorColor);
     return (
-        <div className={`error ${isVisible ? 'visible' : 'hidden'}`} style={{ color: errorColor }}>
+        <div className={`error ${isVisible ? 'visible' : 'hidden'}`} style={{ color: errorColor }} id='error'>
             <p>{translations[error.message]}</p>
         </div>
     );
