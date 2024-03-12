@@ -1,23 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../providers/languages';
+import { useError } from '../providers/errors';
 
-const Error = ({ message, success = false }) => {
+const Error = () => {
     const { translations } = useLanguage();
-    const [isVisible, setIsVisible] = useState(true);
+    const { error, isVisible } = useError();
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsVisible(false);
-        }, 10000);
-        return () => clearTimeout(timer);
-    }, [message]);
+    if (!isVisible) return null;
 
-    if (!isVisible || !message) return null;
-
-
+    const errorColor = error.success ? 'green' : 'red';
     return (
-        <div id="error" style={{ color: success ? 'green' : 'red' }}>
-            {translations[message]}
+        <div className={`error ${isVisible ? 'visible' : 'hidden'}`} style={{ color: errorColor }} id='error'>
+            <p>{translations[error.message]}</p>
         </div>
     );
 };

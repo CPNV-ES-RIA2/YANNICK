@@ -5,24 +5,36 @@ import { useLanguage } from './providers/languages';
 import Languages from './components/Languages';
 import Error from './components/Error';
 import DataResult from './components/DataResult';
+import { useError } from './providers/errors';
 
 const API_URL_BUCKET = 'http://localhost:28468';
 const API_URL_ANALYZE = 'http://localhost:28469';
 
 export default function App() {
   const [dataSource, setDataSource] = useState('');
-  const [error, setError] = useState({
-    message: '',
-    success: false
-
-  });
   const [returnData, setReturnData] = useState();
   const [maxLabel, setMaxLabel] = useState(10);
   const [minConfidence, setMinConfidence] = useState(70);
   const { translations } = useLanguage();
+  const { error, setError } = useError();
+
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
+    if (e.target.potHonney.value) {
+      setError({ message: 'errorPotHonney', success: false });
+      return;
+    }
+
+    if (e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100) {
+      setError({ message: 'errorMaxLabel', success: false });
+      return;
+    }
+    if (e.target.minConfidence.value < 1 || e.target.minConfidence.value > 100) {
+      setError({ message: 'errorMinConfidence', success: false });
+      return;
+    }
+
     const file = dataSource[0];
 
     let returnUrl = '';
@@ -116,17 +128,18 @@ export default function App() {
 
       <Languages />
 
-      <form onSubmit={handleSubmitAnalyze} encType="multipart/form-data">
+      <form onSubmit={handleSubmitAnalyze} encType="multipart/form-data" id='formDataInput'>
         <h1>{translations.title}</h1>
         <p>{translations.description}</p>
         <label htmlFor="dataSource">{translations.dataSource}</label>
         <br />
         <FileUpload handleUploadedFiles={handleUploadedFiles} />
         <label htmlFor="maxLabel">{translations.maxLabel}</label>
-        <input type="number" name="maxLabel" id="maxLabel" value={maxLabel} onChange={(e) => setMaxLabel(e.target.value)} min={1} />
+        <input type="number" name="maxLabel" id="maxLabel" value={maxLabel} onChange={(e) => setMaxLabel(e.target.value)} />
         <label htmlFor="minConfidence">{translations.minConfidence}</label>
-        <input type="number" name="minConfidence" id="minConfidence" value={minConfidence} onChange={(e) => setMinConfidence(e.target.value)} min={1} max={100} />
+        <input type="number" name="minConfidence" id="minConfidence" value={minConfidence} onChange={(e) => setMinConfidence(e.target.value)} onError={(e) => setError({ message: 'errorMinConfidence', success: false })} />
         <br />
+        <input type="hidden" id="potHonney" />
         <button id="analyzeButton">{translations.analyze}</button>
       </form>
 
