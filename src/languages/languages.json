@@ -21,7 +21,9 @@
         "errorMaxLabel": "Max label must be between 0 and 100",
         "noLabelsFound": "No labels found",
         "result": "Result",
-        "errorPotHonney": "It's not nice to hack people"
+        "errorPotHonney": "It's not nice to hack people",
+        "loading": "Loading...",
+        "unavailable": "This service is currently unavailable. Please try again later."
     },
     "fr": {
         "language": "Français",
@@ -45,7 +47,9 @@
         "errorMaxLabel": "Le nombre maximum d'étiquettes doit être supérieur à 0 et 100",
         "noLabelsFound": "Aucun label trouvé",
         "result": "Résultat",
-        "errorPotHonney": "C est pas gentil d'hacker les gens"
+        "errorPotHonney": "C est pas gentil d'hacker les gens",
+        "loading": "Chargement en cours...",
+        "unavailable": "Ce service est actuellement indisponible. Veuillez réessayer plus tard."
     },
     "all": {
         "language": "Deutsch",
@@ -69,6 +73,8 @@
         "errorMaxLabel": "Max label moet tussen 0 en 100 liggen",
         "noLabelsFound": "Geen labels gevonden",
         "result": "Resultaat",
-        "errorPotHonney": "Het is niet leuk om mensen te hacken"
+        "errorPotHonney": "Het is niet leuk om mensen te hacken",
+        "loading": "Bezig met laden...",
+        "unavailable": "Deze service is momenteel niet beschikbaar. Probeer het later opnieuw."
     }
 }
