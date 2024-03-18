@@ -8,9 +8,9 @@ import DataResult from './components/DataResult';
 import { useError } from './providers/errors';
 
 
-const API_URL_BUCKET = `${import.meta.env.VITE_BASE_URL}/api/upload`;
-const API_URL_ANALYZE = `${import.meta.env.VITE_BASE_URL}/api/analyze`;
-const API_URL_DOWNLOAD = `${import.meta.env.VITE_BASE_URL}/download`;
+const API_URL_BUCKET = `${import.meta.env.VITE_DATAOBJECT_BASE_URL}/api/upload`;
+const API_URL_ANALYZE = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/api/analyze`;
+const API_URL_DOWNLOAD = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/download`;
 
 export default function App() {
   const [dataSource, setDataSource] = useState('');
