@@ -7,12 +7,21 @@ COPY . .
 EXPOSE 5173
 CMD ["npm", "run", "dev"]
 
+# docker build --target test -t ria_vision_frontend:test .
+FROM mcr.microsoft.com/playwright:v1.42.1-focal as test
+# Set working directory
+WORKDIR /app
 
-FROM dev as builder
-RUN npm run build
+# Copy test code
+COPY tests /app/tests
+COPY package.json /app/
+# Install dependencies
+RUN npm cache clean --force
+RUN npm install -g playwright
+RUN npm install
+RUN apt-get update && apt-get install -y wget gnupg ca-certificates && \
+    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
+    apt install -y nodejs
 
-# docker build -t ria_vision:prod . 
-FROM nginx:stable-alpine as production-stage
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Run tests
+CMD ["npm", "run", "test"]
