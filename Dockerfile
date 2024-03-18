@@ -1,4 +1,4 @@
-# Étape de développement
+# docker build --target dev -t ria_vision:dev .
 FROM node:20-alpine as dev
 WORKDIR /app
 COPY package*.json ./
@@ -11,7 +11,7 @@ CMD ["npm", "run", "dev"]
 FROM dev as builder
 RUN npm run build
 
-# Étape de production
+# docker build -t ria_vision:prod . 
 FROM nginx:stable-alpine as production-stage
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
