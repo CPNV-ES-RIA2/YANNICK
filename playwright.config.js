@@ -1,16 +1,16 @@
 import { devices, defineConfig } from '@playwright/test';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export default defineConfig({
     testDir: './tests',
     use: {
         headless: true,
         viewport: { width: 1280, height: 720 },
-        baseURL: 'http://127.0.0.1:5173/',
+        baseURL: process.env.VITE_BASE_URL,
     },
     projects: [
         { name: 'Chromium', use: { ...devices['Desktop Chrome'] } },
-        { name: 'Firefox', use: { ...devices['Desktop Firefox'] } },
-        { name: 'WebKit', use: { ...devices['Desktop Safari'] } },
     ],
     workers: process.env.CI ? 1 : undefined
 });

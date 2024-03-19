@@ -4,7 +4,7 @@ dotenv.config();
 
 test.describe('React View BDD Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto('http://gateway');
         await page.selectOption('#language', 'en');
     });
 
@@ -31,7 +31,7 @@ test.describe('React View BDD Tests', () => {
         //THEN
         const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
         expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisible();
+        await expect(page.locator('#error')).toBeVisßible();
     });
 
     test('attempt to upload a non-image file', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('React View BDD Tests', () => {
 
 test.describe('Form Submission Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto('http://gateway');
     });
 
     test('submit form with non-conform minConfidence value', async ({ page }) => {
@@ -103,7 +103,7 @@ test.describe('Form Submission Tests', () => {
 
 test.describe('Language Selection Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto('http://gateway');
         await page.selectOption('#language', 'fr');
     });
 
