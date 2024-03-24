@@ -7,7 +7,7 @@ import ErrorProvider from './providers/errors.jsx'
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('/serviceWorker.js')
+    navigator.serviceWorker.register('./serviceWorker.js')
       .then(function (registration) {
         console.log('Service Worker registration successful with scope: ', registration.scope);
       }, function (err) {

@@ -17,4 +17,14 @@ export default defineConfig({
     },
   },
   envDir,
+  build: {
+    rollupOptions: {
+      output: {
+        dir: 'dist',
+        entryFileNames: 'assets/plugin.js',
+        chunkFileNames: 'assets/chunk.js',
+        assetFileNames: 'assets/styles.css',
+      },
+    }
+  },
 })
