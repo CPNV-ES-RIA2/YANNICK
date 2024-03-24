@@ -6,9 +6,6 @@ export const useError = () => useContext(ErrorContext);
 export const ErrorProvider = ({ children }) => {
     const [error, setError] = useState({ message: '', success: false });
     const [isVisible, setIsVisible] = useState(false);
-
-    console.log('ErrorProvider', error);
-
     useEffect(() => {
         if (error.message) {
             setIsVisible(true);

@@ -7,8 +7,10 @@ import Error from './components/Error';
 import DataResult from './components/DataResult';
 import { useError } from './providers/errors';
 
-const API_URL_BUCKET = 'http://localhost:28468';
-const API_URL_ANALYZE = 'http://localhost:28469';
+
+const API_URL_BUCKET = `${import.meta.env.VITE_DATAOBJECT_BASE_URL}/api/upload`;
+const API_URL_ANALYZE = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/api/analyze`;
+const API_URL_DOWNLOAD = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/download`;
 
 export default function App() {
   const [dataSource, setDataSource] = useState('');
@@ -17,83 +19,92 @@ export default function App() {
   const [minConfidence, setMinConfidence] = useState(70);
   const { translations } = useLanguage();
   const { error, setError } = useError();
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+
+
     if (e.target.potHonney.value) {
       setError({ message: 'errorPotHonney', success: false });
+      setIsLoading(false);
       return;
     }
 
     if (e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100) {
       setError({ message: 'errorMaxLabel', success: false });
+      setIsLoading(false);
       return;
     }
     if (e.target.minConfidence.value < 1 || e.target.minConfidence.value > 100) {
       setError({ message: 'errorMinConfidence', success: false });
+      setIsLoading(false);
       return;
     }
 
     const file = dataSource[0];
 
-    let returnUrl = '';
-
     if (!file) {
       setError({ message: 'errorFileUpload', success: false });
-
+      setIsLoading(false);
       return;
     }
     const formData = new FormData();
     formData.append('image', file);
 
     try {
-      await fetch(`${API_URL_BUCKET}/upload`, {
+      const uploadResponse = await fetch(`${API_URL_BUCKET}`, {
         method: 'POST',
         body: formData
-      })
-        .then(res => res.json())
-        .then(data => {
-          returnUrl = data.url;
-          if (data.status === 500) {
-            throw new Error('errorFileUpload');
-          }
-          setError({ message: 'successFileUpload', success: true });
-          return data.url;
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('unavailable');
+      }
+
+      const uploadData = await uploadResponse.json();
+
+      if (uploadData.status === 500 || uploadData.status === 404) {
+        throw new Error('errorFileUpload');
+      }
+
+      setError({ message: 'successFileUpload', success: true });
+
+      const analysisResponse = await fetch(`${API_URL_ANALYZE}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          url: uploadData.url,
+          maxLabel: Number(maxLabel),
+          minConfidence: Number(minConfidence)
         })
-        .finally(async () => {
-          await fetch(`${API_URL_ANALYZE}/analyze`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              url: returnUrl,
-              maxLabel: Number(maxLabel),
-              minConfidence: Number(minConfidence)
-            })
-          })
-            .then(res => res.json())
-            .then(data => {
-              setReturnData({ ...data.data, url: returnUrl });
-              setMaxLabel(10);
-              setMinConfidence(70);
-              setDataSource('');
-            })
-            .catch(err => {
-              setError({ message: 'errorAnalysis', success: false });
-            });
-        })
-    }
-    catch (err) {
-      setError({ message: err.message, success: false });
+      });
+
+      if (!analysisResponse.ok) {
+        throw new Error('unavailable');
+      }
+
+      const analysisData = await analysisResponse.json();
+      setReturnData({ ...analysisData.data, url: uploadData.url });
+
+    } catch (err) {
+      setError({ message: err.message || 'unavailable', success: false });
+      setIsLoading(false);
+    } finally {
+      setMaxLabel(10);
+      setMinConfidence(70);
+      setDataSource('');
+      setIsLoading(false);
     }
 
   }
 
   const handleDownloadSQL = async () => {
     try {
-      const response = await fetch(`${API_URL_ANALYZE}/download`, {
+      const response = await fetch(`${API_URL_DOWNLOAD}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -102,7 +113,7 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('unavailable');
       }
 
       const blob = await response.blob();
@@ -144,6 +155,7 @@ export default function App() {
       </form>
 
       <div>
+        {isLoading && <div>{translations.loading}</div>}
         {returnData && (
           <>
             <DataResult dataResult={returnData} />

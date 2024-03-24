@@ -21,6 +21,12 @@ test.describe('React View BDD Tests', () => {
 
     test('submit analysis with an existing image and default values', async ({ page }) => {
         //GIVEN 
+        await page.route('**/api/analyze', route => route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({ labels: ['mocked label 1', 'mocked label 2'] })
+        }));
+
         await page.waitForSelector('#formDataInput');
         await page.setInputFiles('#fileUpload', 'tests/images/valid.jpg');
 

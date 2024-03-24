@@ -1,0 +1,76 @@
+const CACHE_NAME = 'v1';
+const urlsToCache = [
+    '/',
+    '/index.html',
+    '/src/styles/index.css',
+    '/src/styles/App.css',
+];
+
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(CACHE_NAME)
+            .then(cache => {
+                console.log('Opened cache');
+                return cache.addAll([
+                    '/',
+                    '/index.html',
+                    '/assets/plugin.js',
+                    '/assets/chunk.js',
+                ]).catch(error => {
+                    console.error('Erreur lors de la mise en cache d une ressource: ', error);
+                });
+            })
+    );
+});
+
+
+self.addEventListener('fetch', event => {
+    // Ignorer les requêtes non supportées ou non pertinentes.
+    if (event.request.url.startsWith('chrome-extension')) {
+        console.log('Ignorons les requêtes de chrome-extension.');
+        return;
+    }
+
+    if (!self.navigator.onLine && (event.request.url.includes('@vite/client') || event.request.url.includes('@react-refresh'))) {
+        console.log('En mode hors ligne, ignorons les requêtes de développement.');
+        return;
+    }
+
+    event.respondWith(
+        caches.match(event.request)
+            .then(response => {
+                return response || fetch(event.request).then(response => {
+                    // Ne mettez en cache que les réponses valides.
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+
+                    var responseToCache = response.clone();
+
+                    caches.open(CACHE_NAME)
+                        .then(cache => {
+                            cache.put(event.request, responseToCache).catch(error => {
+                                console.error('Erreur lors de la mise en cache:', error);
+                            });
+                        });
+
+                    return response;
+                }).catch(error => {
+                    console.error('Fetch a échoué; renvoie la réponse hors ligne si elle existe.', error);
+                    return caches.match(event.request);
+                });
+            })
+    );
+});
+
+
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.filter(cacheName => cacheName !== CACHE_NAME)
+                    .map(cacheName => caches.delete(cacheName))
+            );
+        })
+    );
+});

@@ -1,19 +1,22 @@
-# Stage Development
-FROM node:20-alpine AS dev
+FROM node:20-alpine as base
 WORKDIR /app
-
 COPY package*.json ./
-
-RUN npm install && rm -rf /var/cache/apk/*
-
+RUN npm install
 COPY . .
+RUN npm run build
 
-EXPOSE 28469
+FROM nginx:stable-alpine as prod
+COPY --from=base /app/dist /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
 
+FROM mcr.microsoft.com/playwright:v1.42.1-focal as test
+WORKDIR /app
+COPY --from=base /app /app
+COPY tests /app/tests
+COPY package*.json ./
+RUN npm install
+
+CMD ["npm", "run", "test"]
+
+FROM base as dev
 CMD ["npm", "run", "dev"]
-
-# Stage Test
-FROM dev AS test
-RUN npx playwright install
-
-RUN npm run test
