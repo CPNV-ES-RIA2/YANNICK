@@ -2,14 +2,24 @@ import React from 'react';
 import { useLanguage } from '../providers/languages';
 
 export default function DataResult({ dataResult }) {
-    console.log(dataResult)
     const { translations } = useLanguage();
     const labelsContent = dataResult.Labels?.length > 0 ? (
-        <ul id="labels">
-            {dataResult.Labels.map((label, index) => (
-                <li key={index}>{label.Name} - {label.Confidence.toFixed(2)}%</li>
-            ))}
-        </ul>
+        <table id="labels">
+            <thead>
+                <tr>
+                    <th>{translations.label}</th>
+                    <th>{translations.confidence}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {dataResult.Labels.map((label, index) => (
+                    <tr key={index}>
+                        <td>{label.Name}</td>
+                        <td>{label.Confidence.toFixed(2)}%</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
     ) : <p>{translations.noLabelsFound}</p>;
 
     return (

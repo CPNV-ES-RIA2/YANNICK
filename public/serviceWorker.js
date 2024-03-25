@@ -45,7 +45,6 @@ self.addEventListener('fetch', event => {
 
                     return response;
                 }).catch(error => {
-                    console.error('Fetch a échoué; renvoie la réponse hors ligne si elle existe.', error);
                     return caches.match(event.request);
                 });
             })

@@ -32,7 +32,7 @@ test.describe('React View BDD Tests', () => {
             numberOfLabel: 4,
             MinConfidence: 70,
             averageConfidence: 89.26753044128418,
-            url: "https://example.com/image.png"
+            url: "https://picsum.photos/id/237/200/300"
         };
 
         await page.route('**/api/analyze', route => route.fulfill({
@@ -46,13 +46,11 @@ test.describe('React View BDD Tests', () => {
 
         //WHEN
         await page.click('#analyzeButton');
-        await page.waitForSelector('#labels');
+        await page.waitForSelector('#labels', { timeout: 5000 });
 
         //THEN
         await expect(page.locator('#labels')).toBeVisible();
-
     });
-
 
     test('attempt to submit form without an image', async ({ page }) => {
         //GIVEN
@@ -64,7 +62,7 @@ test.describe('React View BDD Tests', () => {
         //THEN
         const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
         expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisßible();
+        await expect(page.locator('#error')).toBeVisible();
     });
 
     test('attempt to upload a non-image file', async ({ page }) => {

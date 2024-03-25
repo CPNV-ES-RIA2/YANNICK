@@ -6,7 +6,7 @@ import Languages from './components/Languages';
 import Error from './components/Error';
 import DataResult from './components/DataResult';
 import { useError } from './providers/errors';
-import {useVisionStore} from "./stores/vision.store.js";
+import { useResults } from './providers/results';
 
 
 const API_URL_BUCKET = `${import.meta.env.VITE_DATAOBJECT_BASE_URL}/api/upload`;
@@ -14,100 +14,94 @@ const API_URL_ANALYZE = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/api/anal
 const API_URL_DOWNLOAD = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/download`;
 
 export default function App() {
-  const context = useVisionStore(state => state.results);
-
   const [dataSource, setDataSource] = useState('');
-  const [returnData, setReturnData] = useState();
   const [maxLabel, setMaxLabel] = useState(10);
   const [minConfidence, setMinConfidence] = useState(70);
+
+  const { results, setResults, setIsLoading, isLoading } = useResults();
+
   const { translations } = useLanguage();
   const { error, setError } = useError();
-  const [isLoading, setIsLoading] = useState(false);
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const uploadResponse = await fetch(`${API_URL_BUCKET}`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('unavailable');
+    }
+
+    const uploadData = await uploadResponse.json();
+    if (uploadData.status === 500 || uploadData.status === 404) {
+      throw new Error('errorFileUpload');
+    }
+
+    return uploadData.url;
+  };
+
+  const analyzeImage = async (imageUrl) => {
+
+    const analysisResponse = await fetch(`${API_URL_ANALYZE}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        url: imageUrl,
+        maxLabel: Number(maxLabel),
+        minConfidence: Number(minConfidence)
+      })
+    });
+
+    if (!analysisResponse.ok) {
+      throw new Error('unavailable');
+    }
+
+    return await analysisResponse.json();
+  };
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-
-    if (e.target.potHonney.value) {
-      setError({ message: 'errorPotHonney', success: false });
-      setIsLoading(false);
-      return;
-    }
-
-    if (e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100) {
-      setError({ message: 'errorMaxLabel', success: false });
-      setIsLoading(false);
-      return;
-    }
-    if (e.target.minConfidence.value < 1 || e.target.minConfidence.value > 100) {
-      setError({ message: 'errorMinConfidence', success: false });
-      setIsLoading(false);
-      return;
-    }
-
-    const file = dataSource[0];
-
-    if (!file) {
-      setError({ message: 'errorFileUpload', success: false });
-      setIsLoading(false);
-      return;
-    }
-    const formData = new FormData();
-    formData.append('image', file);
-
     try {
-      const uploadResponse = await fetch(`${API_URL_BUCKET}`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('unavailable');
+      // Validate input fields and file selection
+      if (e.target.potHonney.value || e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100 || e.target.minConfidence.value < 1 || e.target.minConfidence.value > 100) {
+        // Set error based on the failed validation
+        setError({ message: 'errorValidation', success: false });
+        setIsLoading(false);
+        return;
       }
 
-      const uploadData = await uploadResponse.json();
-
-      if (uploadData.status === 500 || uploadData.status === 404) {
-        throw new Error('errorFileUpload');
+      const file = dataSource[0];
+      if (!file) {
+        setError({ message: 'errorFileUpload', success: false });
+        setIsLoading(false);
+        return;
       }
 
+      // Upload the image and analyze it
+      const imageUrl = await uploadImage(file);
+      const analysisData = await analyzeImage(imageUrl);
+
+      // Update the results state with the data from the analysis
+      setResults({ ...analysisData.data, url: imageUrl });
       setError({ message: 'successFileUpload', success: true });
-
-      const analysisResponse = await fetch(`${API_URL_ANALYZE}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          url: uploadData.url,
-          maxLabel: Number(maxLabel),
-          minConfidence: Number(minConfidence)
-        })
-      });
-
-      if (!analysisResponse.ok) {
-        throw new Error('unavailable');
-      }
-
-      const analysisData = await analysisResponse.json();
-      context.setResults(analysisData.data, uploadData.url);
-
-      //remove here
-      setReturnData({ ...analysisData.data, url: uploadData.url });
 
     } catch (err) {
       setError({ message: err.message || 'unavailable', success: false });
-      setIsLoading(false);
-      context.setIsLoading(false);
     } finally {
       setMaxLabel(10);
       setMinConfidence(70);
       setDataSource('');
       setIsLoading(false);
     }
-
-  }
+  };
 
   const handleDownloadSQL = async () => {
     try {
@@ -116,7 +110,7 @@ export default function App() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ url: returnData.url })
+        body: JSON.stringify({ url: results.url })
       });
 
       if (!response.ok) {
@@ -163,9 +157,9 @@ export default function App() {
 
       <div>
         {isLoading && <div>{translations.loading}</div>}
-        {returnData && (
+        {results && Object.keys(results).length > 0 && (
           <>
-            <DataResult dataResult={returnData} />
+            <DataResult dataResult={results} />
             <button onClick={() => handleDownloadSQL()} id="downloadSQL">{translations.downloadSQL}</button>
           </>
         )}
