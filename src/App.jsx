@@ -62,18 +62,34 @@ export default function App() {
       throw new Error('unavailable');
     }
 
-    return await analysisResponse.json();
-  };
+    const resultAnalysis = await analysisResponse.json();
+
+    // Update the results state with the data from the analysis
+    setResults({ ...resultAnalysis.data, url: imageUrl });
+
+    return resultAnalysis
+  };;
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      if (e.target.potHonney.value) {
+        setError({ message: 'errorPotHonney', success: false });
+        setIsLoading(false);
+        return;
+      }
       // Validate input fields and file selection
-      if (e.target.potHonney.value || e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100 || e.target.minConfidence.value < 1 || e.target.minConfidence.value > 100) {
+      if (e.target.maxLabel.value < 1 || e.target.maxLabel.value > 100) {
         // Set error based on the failed validation
-        setError({ message: 'errorValidation', success: false });
+        setError({ message: 'errorMaxLabel', success: false });
+        setIsLoading(false);
+        return;
+      }
+
+      if (e.target.minConfidence.value < 0 || e.target.minConfidence.value > 100) {
+        setError({ message: 'errorMinConfidence', success: false });
         setIsLoading(false);
         return;
       }
@@ -89,8 +105,10 @@ export default function App() {
       const imageUrl = await uploadImage(file);
       const analysisData = await analyzeImage(imageUrl);
 
-      // Update the results state with the data from the analysis
-      setResults({ ...analysisData.data, url: imageUrl });
+      if (analysisData.status === 500 || analysisData.status === 404) {
+        throw new Error('errorFileUpload');
+      }
+      // Set the success message
       setError({ message: 'successFileUpload', success: true });
 
     } catch (err) {

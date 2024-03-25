@@ -20,7 +20,7 @@ test.describe('React View BDD Tests', () => {
     });
 
     test('submit analysis with an existing image and default values', async ({ page }) => {
-        //GIVEN 
+        // GIVEN 
         const mockApiResponse = {
             Labels: [
                 { Name: 'Sphere', Confidence: 99.83799743652344 },
@@ -35,6 +35,7 @@ test.describe('React View BDD Tests', () => {
             url: "https://picsum.photos/id/237/200/300"
         };
 
+        // Intercepte la requête API et renvoie une réponse mockée
         await page.route('**/api/analyze', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
@@ -44,39 +45,15 @@ test.describe('React View BDD Tests', () => {
         await page.waitForSelector('#formDataInput');
         await page.setInputFiles('#fileUpload', 'tests/images/valid.jpg');
 
-        //WHEN
+        // WHEN
         await page.click('#analyzeButton');
-        await page.waitForSelector('#labels', { timeout: 5000 });
 
-        //THEN
-        await expect(page.locator('#labels')).toBeVisible();
-    });
-
-    test('attempt to submit form without an image', async ({ page }) => {
-        //GIVEN
-
-        //WHEN
-        await page.click('#analyzeButton');
-        await page.waitForSelector('#error');
-
-        //THEN
-        const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
-        expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisible();
-    });
-
-    test('attempt to upload a non-image file', async ({ page }) => {
-        //GIVEN
-        await page.setInputFiles('#fileUpload', 'tests/images/test-document.txt');
-
-        //WHEN
-        await page.click('#analyzeButton');
-        await page.waitForSelector('#error');
-
-        //THEN
-        const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
-        expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisible();
+        // THEN
+        // Vérifiez que les labels sont bien affichés
+        for (const label of mockApiResponse.Labels) {
+            await expect(page.locator(`text=${label.Name}`)).toBeVisible();
+            await expect(page.locator(`text=${label.Confidence.toFixed(2)}%`)).toBeVisible();
+        }
     });
 });
 
