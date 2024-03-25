@@ -1,16 +1,9 @@
 const CACHE_NAME = 'v1';
-const urlsToCache = [
-    '/',
-    '/index.html',
-    '/src/styles/index.css',
-    '/src/styles/App.css',
-];
 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('Opened cache');
                 return cache.addAll([
                     '/',
                     '/index.html',
@@ -23,11 +16,8 @@ self.addEventListener('install', event => {
     );
 });
 
-
 self.addEventListener('fetch', event => {
-    // Ignorer les requêtes non supportées ou non pertinentes.
     if (event.request.url.startsWith('chrome-extension')) {
-        console.log('Ignorons les requêtes de chrome-extension.');
         return;
     }
 
@@ -40,7 +30,6 @@ self.addEventListener('fetch', event => {
         caches.match(event.request)
             .then(response => {
                 return response || fetch(event.request).then(response => {
-                    // Ne mettez en cache que les réponses valides.
                     if (!response || response.status !== 200 || response.type !== 'basic') {
                         return response;
                     }

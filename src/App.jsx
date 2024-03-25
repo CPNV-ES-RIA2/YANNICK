@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './styles/App.css'
 import FileUpload from './components/FileUpload';
 import { useLanguage } from './providers/languages';
@@ -6,6 +6,7 @@ import Languages from './components/Languages';
 import Error from './components/Error';
 import DataResult from './components/DataResult';
 import { useError } from './providers/errors';
+import {useVisionStore} from "./stores/vision.store.js";
 
 
 const API_URL_BUCKET = `${import.meta.env.VITE_DATAOBJECT_BASE_URL}/api/upload`;
@@ -13,6 +14,8 @@ const API_URL_ANALYZE = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/api/anal
 const API_URL_DOWNLOAD = `${import.meta.env.VITE_LABELDETECTOR_BASE_URL}/download`;
 
 export default function App() {
+  const context = useVisionStore(state => state.results);
+
   const [dataSource, setDataSource] = useState('');
   const [returnData, setReturnData] = useState();
   const [maxLabel, setMaxLabel] = useState(10);
@@ -88,11 +91,15 @@ export default function App() {
       }
 
       const analysisData = await analysisResponse.json();
+      context.setResults(analysisData.data, uploadData.url);
+
+      //remove here
       setReturnData({ ...analysisData.data, url: uploadData.url });
 
     } catch (err) {
       setError({ message: err.message || 'unavailable', success: false });
       setIsLoading(false);
+      context.setIsLoading(false);
     } finally {
       setMaxLabel(10);
       setMinConfidence(70);

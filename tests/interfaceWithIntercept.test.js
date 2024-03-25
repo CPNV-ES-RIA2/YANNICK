@@ -9,7 +9,7 @@ test.describe('Access Website BDD Tests', () => {
         //WHEN
 
         //THEN
-        expect(page.url()).toBe(process.env.VITE_BASE_URL);
+        expect(page.url()).toBe(process.env.VITE_BASE_URL + '/');
     });
 });
 
@@ -21,10 +21,24 @@ test.describe('React View BDD Tests', () => {
 
     test('submit analysis with an existing image and default values', async ({ page }) => {
         //GIVEN 
+        const mockApiResponse = {
+            Labels: [
+                { Name: 'Sphere', Confidence: 99.83799743652344 },
+                { Name: 'Art', Confidence: 93.20249938964844 },
+                { Name: 'Graphics', Confidence: 93.20249938964844 },
+                { Name: 'Smoke Pipe', Confidence: 70.8271255493164 }
+            ],
+            LabelModelVersion: '3.0',
+            numberOfLabel: 4,
+            MinConfidence: 70,
+            averageConfidence: 89.26753044128418,
+            url: "https://example.com/image.png"
+        };
+
         await page.route('**/api/analyze', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({ labels: ['mocked label 1', 'mocked label 2'] })
+            body: JSON.stringify(mockApiResponse)
         }));
 
         await page.waitForSelector('#formDataInput');
@@ -36,7 +50,9 @@ test.describe('React View BDD Tests', () => {
 
         //THEN
         await expect(page.locator('#labels')).toBeVisible();
+
     });
+
 
     test('attempt to submit form without an image', async ({ page }) => {
         //GIVEN

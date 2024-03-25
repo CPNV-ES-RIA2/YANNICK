@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../providers/languages';
 
 export default function DataResult({ dataResult }) {
+    console.log(dataResult)
     const { translations } = useLanguage();
     const labelsContent = dataResult.Labels?.length > 0 ? (
         <ul id="labels">
