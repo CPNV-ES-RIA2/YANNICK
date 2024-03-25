@@ -3,7 +3,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 const ErrorContext = createContext();
 export const useError = () => useContext(ErrorContext);
 
-export const ErrorProvider = ({ children }) => {
+ export const ErrorProvider = ({ children }) => {
     const [error, setError] = useState({ message: '', success: false });
     const [isVisible, setIsVisible] = useState(false);
     useEffect(() => {

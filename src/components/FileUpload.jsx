@@ -4,7 +4,7 @@ import { useLanguage } from '../providers/languages';
 import { useError } from '../providers/errors';
 const FileUpload = ({ handleUploadedFiles }) => {
     const { translations } = useLanguage();
-    const { error, setError } = useError();
+    const { setError } = useError();
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const { getRootProps, getInputProps } = useDropzone({
         accept: {
@@ -17,6 +17,7 @@ const FileUpload = ({ handleUploadedFiles }) => {
         minSize: 0,
         maxSize: 5242880,
         onError: (fileRejections) => {
+            console.log(fileRejections);
             if (fileRejections.length > 0) {
                 setError({ message: 'errorFileUpload', success: false });
             }

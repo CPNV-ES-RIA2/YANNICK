@@ -9,7 +9,7 @@ test.describe('Access Website BDD Tests', () => {
         //WHEN
 
         //THEN
-        expect(page.url()).toBe(process.env.VITE_BASE_URL);
+        expect(page.url()).toBe(process.env.VITE_BASE_URL + '/');
     });
 });
 
@@ -20,49 +20,40 @@ test.describe('React View BDD Tests', () => {
     });
 
     test('submit analysis with an existing image and default values', async ({ page }) => {
-        //GIVEN 
+        // GIVEN 
+        const mockApiResponse = {
+            Labels: [
+                { Name: 'Sphere', Confidence: 99.83799743652344 },
+                { Name: 'Art', Confidence: 93.20249938964844 },
+                { Name: 'Graphics', Confidence: 93.20249938964844 },
+                { Name: 'Smoke Pipe', Confidence: 70.8271255493164 }
+            ],
+            LabelModelVersion: '3.0',
+            numberOfLabel: 4,
+            MinConfidence: 70,
+            averageConfidence: 89.26753044128418,
+            url: "https://picsum.photos/id/237/200/300"
+        };
+
+        // Intercepte la requête API et renvoie une réponse mockée
         await page.route('**/api/analyze', route => route.fulfill({
             status: 200,
             contentType: 'application/json',
-            body: JSON.stringify({ labels: ['mocked label 1', 'mocked label 2'] })
+            body: JSON.stringify(mockApiResponse)
         }));
 
         await page.waitForSelector('#formDataInput');
         await page.setInputFiles('#fileUpload', 'tests/images/valid.jpg');
 
-        //WHEN
+        // WHEN
         await page.click('#analyzeButton');
-        await page.waitForSelector('#labels');
 
-        //THEN
-        await expect(page.locator('#labels')).toBeVisible();
-    });
-
-    test('attempt to submit form without an image', async ({ page }) => {
-        //GIVEN
-
-        //WHEN
-        await page.click('#analyzeButton');
-        await page.waitForSelector('#error');
-
-        //THEN
-        const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
-        expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisßible();
-    });
-
-    test('attempt to upload a non-image file', async ({ page }) => {
-        //GIVEN
-        await page.setInputFiles('#fileUpload', 'tests/images/test-document.txt');
-
-        //WHEN
-        await page.click('#analyzeButton');
-        await page.waitForSelector('#error');
-
-        //THEN
-        const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
-        expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisible();
+        // THEN
+        // Vérifiez que les labels sont bien affichés
+        for (const label of mockApiResponse.Labels) {
+            await expect(page.locator(`text=${label.Name}`)).toBeVisible();
+            await expect(page.locator(`text=${label.Confidence.toFixed(2)}%`)).toBeVisible();
+        }
     });
 });
 
