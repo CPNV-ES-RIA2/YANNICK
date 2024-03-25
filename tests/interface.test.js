@@ -9,7 +9,7 @@ test.describe('Access Website BDD Tests', () => {
         //WHEN
 
         //THEN
-        expect(page.url()).toBe(process.env.VITE_BASE_URL);
+        expect(page.url()).toBe(process.env.VITE_BASE_URL + "/");
     });
 });
 
@@ -42,7 +42,7 @@ test.describe('React View BDD Tests', () => {
         //THEN
         const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);
         expect(color).toBe('rgb(255, 0, 0)');
-        await expect(page.locator('#error')).toBeVisßible();
+        await expect(page.locator('#error')).toBeVisible();
     });
 
     test('attempt to upload a non-image file', async ({ page }) => {
@@ -63,6 +63,7 @@ test.describe('React View BDD Tests', () => {
 test.describe('Form Submission Tests', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto(process.env.VITE_BASE_URL);
+        await page.selectOption('#language', 'en');
     });
 
     test('submit form with non-conform minConfidence value', async ({ page }) => {
@@ -103,7 +104,7 @@ test.describe('Form Submission Tests', () => {
 
         //WHEN
         await page.click('#analyzeButton');
-        await page.waitForSelector('#error');
+        //     await page.waitForSelector('#error');
 
         //THEN
         const color = await page.evaluate(() => window.getComputedStyle(document.querySelector('#error')).color);

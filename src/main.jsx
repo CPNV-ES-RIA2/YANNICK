@@ -4,6 +4,8 @@ import App from './App.jsx'
 import './styles/index.css'
 import { LanguageProvider } from './providers/languages'
 import ErrorProvider from './providers/errors.jsx'
+import {ResultsProvider} from "./providers/results.jsx";
+
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
@@ -20,9 +22,11 @@ if ('serviceWorker' in navigator) {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <LanguageProvider>
-      <ErrorProvider>
-        <App />
-      </ErrorProvider>
+        <ResultsProvider>
+          <ErrorProvider>
+            <App />
+          </ErrorProvider>
+        </ResultsProvider>
     </LanguageProvider>
   </React.StrictMode>,
 )
