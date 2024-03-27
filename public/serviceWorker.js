@@ -10,7 +10,7 @@ self.addEventListener('install', event => {
                     '/assets/plugin.js',
                     '/assets/chunk.js',
                 ]).catch(error => {
-                    console.error('Erreur lors de la mise en cache d une ressource: ', error);
+                    console.error('Error while caching:', error);
                 });
             })
     );
@@ -22,7 +22,7 @@ self.addEventListener('fetch', event => {
     }
 
     if (!self.navigator.onLine && (event.request.url.includes('@vite/client') || event.request.url.includes('@react-refresh'))) {
-        console.log('En mode hors ligne, ignorons les requêtes de développement.');
+        console.log('Offline mode activated');
         return;
     }
 
@@ -39,7 +39,7 @@ self.addEventListener('fetch', event => {
                     caches.open(CACHE_NAME)
                         .then(cache => {
                             cache.put(event.request, responseToCache).catch(error => {
-                                console.error('Erreur lors de la mise en cache:', error);
+                                console.error('Error while caching:', error);
                             });
                         });
 
