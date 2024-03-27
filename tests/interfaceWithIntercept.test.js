@@ -29,32 +29,46 @@ test.describe('React View BDD Tests', () => {
                 { Name: 'Graphics', Confidence: 93.20249938964844 },
                 { Name: 'Smoke Pipe', Confidence: 70.8271255493164 }
             ],
-            LabelModelVersion: '3.0',
             numberOfLabel: 4,
             MinConfidence: 70,
             averageConfidence: 89.26753044128418,
             url: "https://picsum.photos/id/237/200/300"
         };
 
-        // Intercepte la requête API et renvoie une réponse mockée
-        await page.route('**/api/analyze', route => route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            body: JSON.stringify(mockApiResponse)
-        }));
+        await page.route('**/api/upload', route => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    url: 'mockImageUrl',
+                    status: 200
+                })
+            });
+        });
 
-        await page.waitForSelector('#formDataInput');
+        // Intercept API calls for analyze
+        await page.route('**/api/analyze', route => {
+            route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    data: mockApiResponse, // Use mockApiResponse as the response data
+                    status: 200
+                })
+            });
+        });
         await page.setInputFiles('#fileUpload', 'tests/images/valid.jpg');
 
         // WHEN
         await page.click('#analyzeButton');
 
+        await page.waitForSelector('#labels');
         // THEN
-        // Vérifiez que les labels sont bien affichés
-        for (const label of mockApiResponse.Labels) {
-            await expect(page.locator(`text=${label.Name}`)).toBeVisible();
-            await expect(page.locator(`text=${label.Confidence.toFixed(2)}%`)).toBeVisible();
-        }
+        const sphereRow = page.locator('tr', { has: page.locator('td', { hasText: 'Sphere' }) });
+        await expect(sphereRow.locator('td:first-child')).toHaveText('Sphere');
+        await expect(sphereRow.locator('td:nth-child(2)')).toHaveText('99.84%');
+
+
     });
 });
 

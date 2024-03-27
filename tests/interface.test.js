@@ -95,6 +95,10 @@ test.describe('Form Submission Tests', () => {
 
         //THEN
         await expect(page.locator('#labels')).toBeVisible();
+
+        const rowCount = await page.locator('#labels tbody tr').count();
+
+        expect(rowCount).toBe(5);
     });
 
     test('submit form with honney pot value filled', async ({ page }) => {
