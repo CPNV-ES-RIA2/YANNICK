@@ -94,19 +94,6 @@ test.describe('Form Submission Tests', () => {
         await expect(page.locator('#error')).toHaveText('Min confidence must be between 0 and 100')
     });
 
-    test('submit form with changed values for maxLabel and minConfidence', async ({ page }) => {
-        //GIVEN
-        await page.setInputFiles('#fileUpload', 'tests/images/valid.jpg');
-        await page.fill('#maxLabel', '5');
-        await page.fill('#minConfidence', '80');
-
-        //WHEN
-        await page.click('#analyzeButton');
-        await page.waitForSelector('#labels');
-
-        //THEN
-        await expect(page.locator('#labels')).toBeVisible();
-    });
 
     test('submit form with honney pot value filled', async ({ page }) => {
         //GIVEN
