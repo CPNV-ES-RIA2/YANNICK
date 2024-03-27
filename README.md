@@ -14,6 +14,8 @@ Ce service permet aux utilisateurs d'uploader une image, laquelle est ensuite an
 
 ### Pré-requis
 
+ATTENTION : Avant de lancer le projet en local, il faut vous assurer que vous avez bien lancé les services backends disponible : (Projet)[https://github.com/YannickPerret/RIA-Vision.git]
+
 Retrouvez la liste de tout les pré-requis pour lancer le projet.
 
 * IDE utilisé : Visual Studio Code 1.85.1
@@ -21,6 +23,26 @@ Retrouvez la liste de tout les pré-requis pour lancer le projet.
 * OS supported : MacOS, Linux, Windows
 * Environmment Node.js : minimum v21.0.0
 * Reactjs : 18.2.0
+
+### Docker
+Pour lancer le projet avec Docker, il faut installer Docker sur votre machine. Pour cela, suivez les instructions sur le site officiel de Docker : https://docs.docker.com/get-docker/.
+
+#### Variables d'Environnement
+Il faut copier le .env.example en .env et remplir les informations.
+
+#### Lancement de projet avec Docker en standalone
+
+Pour lancer le projet avec Docker, utilisez la commande suivante pour build l'image :
+
+```bash
+docker build -t frontend . 
+```
+
+Ensuite, lancez le container avec la commande suivante :
+
+```bash
+docker run -d -p 5173:5173 frontend
+```
 
 ### Configuration
 
@@ -103,33 +125,21 @@ Chaque service peut être lancer indépendamment des autres. Pour cela, il faut 
 npm run dev
 ```
 
+## Structure du Projet
 ```shell
 .
-├── dataObject    //nodejs Bucket AWS
-│   ├── libs
-│   ├── tests
-│   │   ├── download
-│   │   └── images
-│   └── uploads
-├── dist
-│   └── assets
-├── labelDetector //nodejs AWS Rekognition et RethinkDB
-│   ├── lib
-│   │   ├── database
-│   │   └── providers
-│   └── rethinkdb_data
-│       └── tmp
-│   ├── tests
-│   │   ├── download
-│   │   └── images
 ├── public
-├── src           //ReactJS
-│   ├── assets
-│   ├── components
-│   └── styles
+├── src
+│ ├── assets
+│ ├── components
+│ ├── languages
+│ ├── providers
+│ └── styles
+├── test-results
 └── tests
+    ├── features
     └── images
-        └── tests
+
 ```
 
 ## Contribuer au Projet
