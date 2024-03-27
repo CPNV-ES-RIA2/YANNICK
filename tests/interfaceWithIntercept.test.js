@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import dotenv from 'dotenv';
 dotenv.config();
 
+// TEST  WITH MOCKED API
 test.describe('Access Website BDD Tests', () => {
     test('access website', async ({ page }) => {
         //GIVEN

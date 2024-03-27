@@ -7,7 +7,7 @@ import ErrorProvider from './providers/errors.jsx'
 import {ResultsProvider} from "./providers/results.jsx";
 
 
-/*if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
     navigator.serviceWorker.register('./serviceWorker.js')
       .then(function (registration) {
@@ -16,7 +16,7 @@ import {ResultsProvider} from "./providers/results.jsx";
         console.log('Service Worker registration failed: ', err);
       });
   });
-}*/
+}
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(

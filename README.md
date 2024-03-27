@@ -68,15 +68,37 @@ Une fois le projet cloné et les prérequis installé, il faut installer les dé
 ```bash
 npm install
 ```
+Résultat : 
+```bash
+tchoune@yannicks-MacBook-Pro YANNICK % npm install
+
+added 319 packages, and audited 320 packages in 14s
+
+109 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+```
 
 Pour lancer le projet en local, utilisez la commande raccourcis suivante, qui va lancer le server sur le port 5173 : 
 ```bash
 npm run dev
 ```
+
+Résultat : 
+```bash
+  VITE v5.2.6  ready in 422 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://10.xxx.56.89:5173/
+  ➜  Network: http://19x.168.xx.1:5173/
+  ➜  press h + enter to show help
+```
+
 Accédez ensuite à l'application via l'url suivante : http://localhost:5173/
 
 #### Tests
-Pour lancer les tests, utilisez la commande suivante : 
+Pour lancer les tests, dans un nouveau terminal, utilisez la commande suivante : 
 ```bash
 npm run test
 ```
@@ -85,18 +107,17 @@ resultat attendu :
  
 ```
 
-Pour lancer un test spécifique, utilisez la commande suivante : 
+#### Docker Test : 
+Pour lancer les tests avec Docker, utilisez la commande suivante pour build l'image :
+
 ```bash
-jest tests
+docker build --target test -t frontent-test .
 ```
 
-par exemple : 
-```bash
-jest labelDetector/tests/LabelDetector.test.js 
-```
-avec le resultat suivant : 
-```bash
+Ensuite, lancez le container avec la commande suivante :
 
+```bash
+docker run -d frontent-test
 ```
 
 ### Sur l'environnement de production
