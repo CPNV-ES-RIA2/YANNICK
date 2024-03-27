@@ -1,6 +1,7 @@
 name: Playwright Tests
 
-env: VITE_BASE_URL : http://localhost:5173
+env:
+  VITE_BASE_URL : http://localhost:5173
 
 on:
   push:
