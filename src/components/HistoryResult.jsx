@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import db from '../database/db';
+import {useLanguage} from "../providers/languages";
 
 const HistoryResult = () => {
     const [analyses, setAnalyses] = useState([]);
+    const { translations } = useLanguage();
 
     useEffect(() => {
         const fetchAnalyses = async () => {
@@ -15,17 +17,17 @@ const HistoryResult = () => {
 
     return (
         <div>
-            <h3>Historique des analyses</h3>
+            <h3>{translations.historyAnalyzes}</h3>
             <table>
                 <thead>
                 <tr>
                     <th>ID</th>
                     <th>Date</th>
-                    <th>Image</th>
-                    <th>Labels</th>
-                    <th>Nombre de Labels</th>
-                    <th>Confiance Min</th>
-                    <th>Confiance Moyenne</th>
+                    <th>{translations.labelImage}</th>
+                    <th>{translations.labels}</th>
+                    <th>{translations.nbLabels}</th>
+                    <th>{translations.labelConfMin}</th>
+                    <th>{translations.labelConfAverage}</th>
                 </tr>
                 </thead>
                 <tbody>

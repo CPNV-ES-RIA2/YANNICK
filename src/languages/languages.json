@@ -25,7 +25,12 @@
         "errorPotHonney": "It's not nice to hack people",
         "loading": "Loading...",
         "unavailable": "This service is currently unavailable. Please try again later.",
-        "undefined": "Undefined"
+        "undefined": "Undefined",
+        "historyAnalyzes": "History of analyzes",
+        "nbLabels": "Number of labels",
+        "labelConfMin": "Min confidence",
+        "labelConfAverage": "Average confidence",
+        "labelImage": "Image"
     },
     "fr": {
         "language": "Français",
@@ -53,7 +58,12 @@
         "errorPotHonney": "C est pas gentil d'hacker les gens",
         "loading": "Chargement en cours...",
         "unavailable": "Ce service est actuellement indisponible. Veuillez réessayer plus tard.",
-        "undefined": "Non défini"
+        "undefined": "Non défini",
+        "historyAnalyzes": "Historique des analyses",
+        "nbLabels": "Nombre de labels",
+        "labelConfMin": "Confiance min",
+        "labelConfAverage": "Confiance moyenne",
+        "labelImage": "Image"
     },
     "all": {
         "language": "Deutsch",
@@ -81,6 +91,11 @@
         "errorPotHonney": "Het is niet leuk om mensen te hacken",
         "loading": "Bezig met laden...",
         "unavailable": "Deze service is momenteel niet beschikbaar. Probeer het later opnieuw.",
-        "undefined": "Niet gedefinieerd"
+        "undefined": "Niet gedefinieerd",
+        "historyAnalyzes": "Geschiedenis van analyses",
+        "nbLabels": "Aantal labels",
+        "labelConfMin": "Min vertrouwen",
+        "labelConfAverage": "Gemiddeld vertrouwen",
+        "labelImage": "Afbeelding"
     }
 }
