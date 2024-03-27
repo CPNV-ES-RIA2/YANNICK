@@ -99,25 +99,70 @@ Accédez ensuite à l'application via l'url suivante : http://localhost:5173/
 
 #### Tests
 Pour lancer les tests, dans un nouveau terminal, utilisez la commande suivante : 
+Version avec backend active : 
 ```bash
-npm run test
+npm run test tests/interface.test.js
 ```
 resultat attendu : 
 ```bash
- 
+ tchoune@yannicks-MacBook-Pro ria2-frontend % npm run test tests/interface.test.js
+
+> bi-frontend@0.0.0 test
+> npx playwright test tests/interface.test.js
+
+
+Running 8 tests using 1 worker
+
+  ✓  1 [Chromium] › interface.test.js:6:5 › Access Website BDD Tests › access website (121ms)
+  ✓  2 [Chromium] › interface.test.js:22:5 › React View BDD Tests › submit analysis with an existing image and default values (3.1s)
+  ✓  3 [Chromium] › interface.test.js:35:5 › React View BDD Tests › attempt to submit form without an image (242ms)
+  ✓  4 [Chromium] › interface.test.js:48:5 › React View BDD Tests › attempt to upload a non-image file (256ms)
+  ✓  5 [Chromium] › interface.test.js:69:5 › Form Submission Tests › submit form with non-conform minConfidence value (253ms)
+  ✓  6 [Chromium] › interface.test.js:86:5 › Form Submission Tests › submit form with changed values for maxLabel and minConfidence (2.5s)
+  ✓  7 [Chromium] › interface.test.js:104:5 › Form Submission Tests › submit form with honney pot value filled (216ms)
+  ✓  8 [Chromium] › interface.test.js:126:5 › Language Selection Tests › change application language without page reload (195ms)
+
+  8 passed (7.4s)
+
+```
+
+Pour la version mockup sans backend : 
+```bash
+npm run test tests/interfaceWithIntercept.test.js
+```
+
+résultat attendu : 
+```bash
+tchoune@yannicks-MacBook-Pro ria2-frontend % npm run test tests/interfaceWithIntercept.test.js
+
+
+> bi-frontend@0.0.0 test
+> npx playwright test tests/interfaceWithIntercept.test.js
+
+
+Running 5 tests using 1 worker
+
+  ✓  1 [Chromium] › interfaceWithIntercept.test.js:7:5 › Access Website BDD Tests › access website (122ms)
+  ✓  2 [Chromium] › interfaceWithIntercept.test.js:23:5 › React View BDD Tests › submit analysis with an existing image and default values (295ms)
+  ✓  3 [Chromium] › interfaceWithIntercept.test.js:80:5 › Form Submission Tests › submit form with non-conform minConfidence value (255ms)
+  ✓  4 [Chromium] › interfaceWithIntercept.test.js:98:5 › Form Submission Tests › submit form with honney pot value filled (253ms)
+  ✓  5 [Chromium] › interfaceWithIntercept.test.js:120:5 › Language Selection Tests › change application language without page reload (197ms)
+
+  5 passed (1.7s)
 ```
 
 #### Docker Test : 
 Pour lancer les tests avec Docker, utilisez la commande suivante pour build l'image :
 
 ```bash
-docker build --target test -t frontent-test .
+docker build --target test -t frontend-test . 
 ```
 
 Ensuite, lancez le container avec la commande suivante :
 
 ```bash
-docker run -d frontent-test
+ docker run -it frontend-test:latest npm run test
+
 ```
 
 ### Sur l'environnement de production

@@ -3,20 +3,22 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // TEST  WITH MOCKED API
+
+const websiteUrl = process.env.VITE_BASE_URL || 'http://localhost:80';
 test.describe('Access Website BDD Tests', () => {
     test('access website', async ({ page }) => {
         //GIVEN
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto(websiteUrl);
         //WHEN
 
         //THEN
-        expect(page.url()).toBe(process.env.VITE_BASE_URL + '/');
+        expect(page.url()).toBe(websiteUrl + '/');
     });
 });
 
 test.describe('React View BDD Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto(websiteUrl);
         await page.selectOption('#language', 'en');
     });
 
@@ -74,7 +76,7 @@ test.describe('React View BDD Tests', () => {
 
 test.describe('Form Submission Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto(websiteUrl);
     });
 
     test('submit form with non-conform minConfidence value', async ({ page }) => {
@@ -113,7 +115,7 @@ test.describe('Form Submission Tests', () => {
 
 test.describe('Language Selection Tests', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto(process.env.VITE_BASE_URL);
+        await page.goto(websiteUrl);
         await page.selectOption('#language', 'fr');
     });
 
