@@ -24,7 +24,8 @@
         "result": "Result",
         "errorPotHonney": "It's not nice to hack people",
         "loading": "Loading...",
-        "unavailable": "This service is currently unavailable. Please try again later."
+        "unavailable": "This service is currently unavailable. Please try again later.",
+        "undefined": "Undefined"
     },
     "fr": {
         "language": "Français",
@@ -51,7 +52,8 @@
         "result": "Résultat",
         "errorPotHonney": "C est pas gentil d'hacker les gens",
         "loading": "Chargement en cours...",
-        "unavailable": "Ce service est actuellement indisponible. Veuillez réessayer plus tard."
+        "unavailable": "Ce service est actuellement indisponible. Veuillez réessayer plus tard.",
+        "undefined": "Non défini"
     },
     "all": {
         "language": "Deutsch",
@@ -78,6 +80,7 @@
         "result": "Resultaat",
         "errorPotHonney": "Het is niet leuk om mensen te hacken",
         "loading": "Bezig met laden...",
-        "unavailable": "Deze service is momenteel niet beschikbaar. Probeer het later opnieuw."
+        "unavailable": "Deze service is momenteel niet beschikbaar. Probeer het later opnieuw.",
+        "undefined": "Niet gedefinieerd"
     }
 }

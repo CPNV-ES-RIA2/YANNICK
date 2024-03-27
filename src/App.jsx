@@ -7,6 +7,8 @@ import Error from './components/Error';
 import DataResult from './components/DataResult';
 import { useError } from './providers/errors';
 import { useResults } from './providers/results';
+import db from "./database/db.js";
+import HistoryResult from "./components/HistoryResult";
 
 
 const API_URL_BUCKET = `${import.meta.env.VITE_DATAOBJECT_BASE_URL}/api/upload`;
@@ -24,24 +26,39 @@ export default function App() {
   const { error, setError } = useError();
 
   const uploadImage = async (file) => {
-    const formData = new FormData();
-    formData.append('image', file);
 
-    const uploadResponse = await fetch(`${API_URL_BUCKET}`, {
-      method: 'POST',
-      body: formData
-    });
+    try {
+      const cache = await caches.open('images-cache');
+      const cachedResponse = await cache.match(file.name);
 
-    if (!uploadResponse.ok) {
-      throw new Error('unavailable');
+      if (cachedResponse) {
+        return cachedResponse.url;
+      }
+      else
+      {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const uploadResponse = await fetch(`${API_URL_BUCKET}`, {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('unavailable');
+        }
+
+        const uploadData = await uploadResponse.json();
+        if (uploadData.status === 500 || uploadData.status === 404) {
+          throw new Error('errorFileUpload');
+        }
+
+        return uploadData.url;
+      }
     }
-
-    const uploadData = await uploadResponse.json();
-    if (uploadData.status === 500 || uploadData.status === 404) {
-      throw new Error('errorFileUpload');
+    catch (err) {
+        setError({ message:'unavailable' , success: false });
     }
-
-    return uploadData.url;
   };
 
   const analyzeImage = async (imageUrl) => {
@@ -67,8 +84,17 @@ export default function App() {
     // Update the results state with the data from the analysis
     setResults({ ...resultAnalysis.data, url: imageUrl });
 
+    await db.analyses.add({
+      date: new Date(),
+      labels: resultAnalysis.data.Labels,
+      numberOfLabel: resultAnalysis.data.numberOfLabel,
+      minConfidence: resultAnalysis.data.MinConfidence,
+      averageConfidence: resultAnalysis.data.averageConfidence,
+      image: dataSource[0].name
+    });
+
     return resultAnalysis
-  };;
+  };
 
   const handleSubmitAnalyze = async (e) => {
     e.preventDefault();
@@ -108,6 +134,7 @@ export default function App() {
       if (analysisData.status === 500 || analysisData.status === 404) {
         throw new Error('errorFileUpload');
       }
+
       // Set the success message
       setError({ message: 'successFileUpload', success: true });
 
@@ -182,6 +209,8 @@ export default function App() {
           </>
         )}
       </div>
+
+      <HistoryResult />
     </div >
   )
 }
